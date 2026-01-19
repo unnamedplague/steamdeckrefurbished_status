@@ -1,8 +1,8 @@
-const { checkStock } = require('./utils/scraper');
-// Trigger test push
-const { getDb } = require('./utils/database');
-const { sendNotification } = require('./utils/notifier');
-require('dotenv').config();
+import { checkStock } from './utils/scraper.js';
+import { getDb } from './utils/database.js';
+import { sendNotification } from './utils/notifier.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 async function runCron() {
     console.log(`[${new Date().toLocaleString()}] GitHub Action: Starter lager-tjek...`);
@@ -10,16 +10,12 @@ async function runCron() {
         const currentStock = await checkStock();
         const db = await getDb();
 
-        // lowdb/node i version 5+ loader data ved JSONFilePreset, 
-        // men vi skal sikre os vi har de nyeste data hvis vi committer db.json
         const prevStock = db.data.stockStatus || [];
         let changeDetected = false;
         let message = 'Lagerstatus ændringer fundet på Refurbished Steam Decks:\n\n';
 
         currentStock.forEach(item => {
             const prevItem = prevStock.find(ps => ps.name === item.name);
-            // Vi sender kun besked hvis den går FRA "Out of Stock" TIL "In Stock" 
-            // eller hvis det er en helt ny model vi ser for første gang
             if ((!prevItem && item.status === 'In Stock') || (prevItem && prevItem.status !== item.status)) {
                 changeDetected = true;
                 message += `${item.name}: ${prevItem ? prevItem.status : 'Ukendt'} -> ${item.status}\n`;

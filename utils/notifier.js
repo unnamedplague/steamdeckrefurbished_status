@@ -1,6 +1,7 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-async function sendNotification(title, message) {
+export async function sendNotification(title, message) {
     const topic = process.env.NTFY_TOPIC;
 
     if (!topic) {
@@ -16,7 +17,7 @@ async function sendNotification(title, message) {
                 topic: topic,
                 message: message,
                 title: title,
-                priority: 4, // 5 is max
+                priority: 4,
                 tags: ['steam', 'shopping_cart']
             }),
             headers: {
@@ -33,6 +34,3 @@ async function sendNotification(title, message) {
         console.error('Netværksfejl ved afsendelse til NTFY:', error);
     }
 }
-
-// Eksporter som sendEmail for bagudkompatibilitet eller omdøb hvis vi opdaterer index.js
-module.exports = { sendNotification };

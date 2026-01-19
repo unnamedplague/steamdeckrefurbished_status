@@ -1,10 +1,15 @@
-const express = require('express');
-const cron = require('node-cron');
-const { checkStock } = require('./utils/scraper');
-const { getDb } = require('./utils/database');
-const { sendNotification } = require('./utils/notifier');
-const path = require('path');
-require('dotenv').config();
+import express from 'express';
+import cron from 'node-cron';
+import { checkStock } from './utils/scraper.js';
+import { getDb } from './utils/database.js';
+import { sendNotification } from './utils/notifier.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,7 +22,7 @@ async function performCheck() {
         const currentStock = await checkStock();
         const db = await getDb();
 
-        const prevStock = db.data.stockStatus;
+        const prevStock = db.data.stockStatus || [];
         let changeDetected = false;
         let message = 'Lagerstatus ændringer fundet på Refurbished Steam Decks:\n\n';
 

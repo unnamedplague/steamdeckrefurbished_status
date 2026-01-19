@@ -1,6 +1,6 @@
-const { chromium } = require('playwright');
+import { chromium } from 'playwright';
 
-async function checkStock() {
+export async function checkStock() {
     const browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
 
@@ -47,5 +47,3 @@ async function checkStock() {
         await browser.close();
     }
 }
-
-module.exports = { checkStock };

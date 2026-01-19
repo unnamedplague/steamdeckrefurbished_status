@@ -1,9 +1,7 @@
-const { JSONFilePreset } = require('lowdb/node');
+import { JSONFilePreset } from 'lowdb/node';
 
-async function getDb() {
+export async function getDb() {
     const defaultData = { stockStatus: [], lastUpdate: null };
     const db = await JSONFilePreset('db.json', defaultData);
     return db;
 }
-
-module.exports = { getDb };
