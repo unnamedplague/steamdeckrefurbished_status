@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Deck Stock Checker</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --text-color: #ffffff;
+            --accent-color: #1a9fff;
+            --instock: #4caf50;
+            --outofstock: #f44336;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { margin-bottom: 2rem; }
+
+        .dashboard {
+            width: 100%;
+            max-width: 800px;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .status.instock { background-color: var(--instock); }
+        .status.outofstock { background-color: var(--outofstock); }
+
+        .last-updated {
+            margin-top: 2rem;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        button {
+            margin-top: 1rem;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <h1>Steam Deck Refurbished Lager</h1>
+    
+    <div id="dashboard" class="dashboard">
+        Indlæser...
+    </div>
+
+    <p id="last-update" class="last-updated"></p>
+    
+    <button onclick="checkNow()">Tjek nu</button>
+
+    <script>
+        async function fetchStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                render(data);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function render(data) {
+            const container = document.getElementById('dashboard');
+            const updateEl = document.getElementById('last-update');
+            
+            if (!data.stockStatus || data.stockStatus.length === 0) {
+                container.innerHTML = "Ingen data endnu. Tryk på 'Tjek nu'.";
+                return;
+            }
+
+            container.innerHTML = data.stockStatus.map(item => `
+                <div class="card">
+                    <div>${item.name}</div>
+                    <div class="status ${item.status.toLowerCase().replace(/\s/g, '')}">
+                        ${item.status}
+                    </div>
+                </div>
+            `).join('');
+
+            updateEl.innerText = "Sidst opdateret: " + new Date(data.lastUpdate).toLocaleString();
+        }
+
+        async function checkNow() {
+            document.getElementById('dashboard').innerHTML = "Tjekker lager... (dette tager ca. 10-20 sekunder)";
+            await fetch('/api/check-now');
+            fetchStatus();
+        }
+
+        fetchStatus();
+    </script>
+</body>
+</html>
