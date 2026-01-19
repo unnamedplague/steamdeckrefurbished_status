@@ -1,4 +1,5 @@
 const { checkStock } = require('./utils/scraper');
+// Trigger test push
 const { getDb } = require('./utils/database');
 const { sendNotification } = require('./utils/notifier');
 require('dotenv').config();
