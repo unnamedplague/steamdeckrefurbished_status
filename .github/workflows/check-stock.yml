@@ -3,6 +3,8 @@ name: Steam Deck Stock Check
 on:
   schedule:
     - cron: '0 */2 * * *' # Kører hver 2. time
+  push:
+    branches: [ main ]
   workflow_dispatch: # Tillader manuel start fra GitHub UI
 
 jobs:
